@@ -38,22 +38,31 @@ int writeText(WINDOW* win, const char* fmt, ...)
     vsnprintf(text, sizeof(text), fmt, args);
     va_end(args);
 
-    for (size_t i = 0; i < strlen(text); i++)
-    {
+    int writeText(WINDOW* win, const char* fmt, ...) {
+    int max_y, y, max_x, x;
+    getmaxyx(win, max_y, max_x);
+    getyx(win, y, x); // Get current cursor position
+
+    // Start at (1, 1) only if at the very beginning
+    if (y == 0 && x == 0) { 
+        wmove(win, 1, 1);
+    } 
+
+    char text[1024];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(text, sizeof(text), fmt, args);
+    va_end(args);
+
+    for (size_t i = 0; i < strlen(text); i++) {
         getyx(win, y, x);
-        if (x >= max_x - 1 || text[i] == '\n') 
-        {
-            if (text[i] == '\n')
-            {
-                wmove(win, y + 1, 1);
+        if (x >= max_x - 1 || text[i] == '\n') {
+            if (text[i] == '\n') {
+                wmove(win, y + 1, 1); 
+            } else {
+                wmove(win, y + 1, 0); 
             }
-            else
-            {
-                wmove(win, y + 1, 0);
-            }
-        }
-        else
-        {
+        } else {
             waddch(win, text[i]);
         }
     }
